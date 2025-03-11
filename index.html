@@ -9,9 +9,10 @@
 <body>
     <div class="container">
         <h1>Webcam Scanner</h1>
-        <video id="webcam" autoplay playsinline style="display:none;"></video>
-        <canvas id="canvas"></canvas>
-        <p id="status" style="color: blue;">Loading...</p>
+        <video id="webcam" autoplay playsinline style="display:block; max-width:100%;"></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <button id="startButton">Start Camera</button>
+        <p id="status" style="color: blue;">Click "Start Camera" to begin</p>
         <p id="error" style="color: red;"></p>
     </div>
     <script src="script.js"></script>
