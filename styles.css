@@ -187,6 +187,38 @@ h1 {
     100% { top: 100%; }
 }
 
+/* Color picker styling */
+.color-picker-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 15px auto;
+    gap: 10px;
+}
+
+#colorPicker {
+    height: 40px;
+    width: 40px;
+    border: 1px solid #32de84;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+#colorPicker::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+#colorPicker::-webkit-color-swatch {
+    border: none;
+}
+
+label[for="colorPicker"] {
+    font-size: 0.8em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
 @media (max-width: 600px) {
     h1 {
         font-size: 1.2em;
@@ -197,5 +229,9 @@ h1 {
     #startButton {
         width: 80%;
         padding: 15px;
+    }
+    .color-picker-container {
+        flex-direction: column;
+        gap: 5px;
     }
 }

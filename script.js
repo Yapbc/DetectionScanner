@@ -4,6 +4,25 @@ const startButton = document.getElementById('startButton');
 const statusDisplay = document.getElementById('status');
 const errorDisplay = document.getElementById('error');
 
+// Add color picker input
+const colorPickerContainer = document.createElement('div');
+colorPickerContainer.className = 'color-picker-container';
+
+const colorPickerLabel = document.createElement('label');
+colorPickerLabel.htmlFor = 'colorPicker';
+colorPickerLabel.textContent = 'SELECT BASE COLOR:';
+
+const colorPicker = document.createElement('input');
+colorPicker.type = 'color';
+colorPicker.id = 'colorPicker';
+colorPicker.value = '#FFFF00'; // Default yellow
+
+colorPickerContainer.appendChild(colorPickerLabel);
+colorPickerContainer.appendChild(colorPicker);
+
+// Insert after start button
+startButton.parentNode.insertBefore(colorPickerContainer, startButton.nextSibling);
+
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 if (!gl) {
     errorDisplay.textContent = 'WebGL not supported. Showing raw feed only.';
@@ -15,6 +34,7 @@ if (!gl) {
 
 let program;
 let texture;
+let colorUniformLocation;
 
 // Vertex shader
 const vertexShaderSource = `
@@ -32,10 +52,10 @@ const fragmentShaderSource = `
     precision highp float;
     varying vec2 v_texCoord;
     uniform sampler2D u_texture;
+    uniform vec3 u_baseColor;
     void main() {
         vec4 feed = texture2D(u_texture, v_texCoord);
-        vec3 yellow = vec3(1.0, 1.0, 0.0);
-        vec3 diff = abs(feed.rgb - yellow);
+        vec3 diff = abs(feed.rgb - u_baseColor);
         gl_FragColor = vec4(diff, 1.0);
     }
 `;
@@ -90,6 +110,26 @@ startButton.addEventListener('click', () => {
         });
 });
 
+// Handle color change
+colorPicker.addEventListener('input', updateBaseColor);
+
+// Convert hex color to RGB values (0.0 to 1.0)
+function hexToRgb(hex) {
+    const r = parseInt(hex.substring(1, 3), 16) / 255;
+    const g = parseInt(hex.substring(3, 5), 16) / 255;
+    const b = parseInt(hex.substring(5, 7), 16) / 255;
+    return [r, g, b];
+}
+
+// Update shader uniform with new color
+function updateBaseColor() {
+    if (gl && program) {
+        const rgbColor = hexToRgb(colorPicker.value);
+        gl.useProgram(program);
+        gl.uniform3fv(colorUniformLocation, rgbColor);
+    }
+}
+
 // Initialize WebGL
 function initWebGL() {
     console.log('Initializing WebGL');
@@ -124,6 +164,11 @@ function initWebGL() {
     gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 16, 8);
 
     gl.uniform1i(gl.getUniformLocation(program, 'u_texture'), 0);
+    
+    // Set up the color uniform
+    colorUniformLocation = gl.getUniformLocation(program, 'u_baseColor');
+    updateBaseColor(); // Set initial color
+    
     statusDisplay.textContent = 'WebGL initialized, rendering...';
     console.log('WebGL initialized');
 }
