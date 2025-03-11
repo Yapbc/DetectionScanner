@@ -17,6 +17,7 @@
         <div class="video-container">
             <video id="webcam" autoplay playsinline></video>
             <canvas id="canvas" style="display:none;"></canvas>
+            <img id="uploadedImage" style="display:none; width:100%; height:100%; object-fit:cover;">
         </div>
         
         <div class="controls-container">
@@ -24,9 +25,16 @@
             <!-- Color picker will be added here via JavaScript -->
         </div>
         
+        <!-- Add file upload option -->
+        <div class="upload-container">
+            <label for="imageUpload" class="upload-label">OR UPLOAD IMAGE</label>
+            <input type="file" id="imageUpload" accept="image/*" class="file-input">
+        </div>
+        
         <p id="status">CELLS INTERLINKED. CLICK "INITIATE SCAN" TO BEGIN</p>
         <p id="error" style="color: #ff3a3a;"></p>
     </div>
     <script src="script.js"></script>
+    <script src="upload.js"></script>
 </body>
 </html>

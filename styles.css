@@ -312,3 +312,48 @@ label[for="colorPicker"] {
         z-index: 100;
     }
 }
+
+/* File upload styling */
+.upload-container {
+    margin: 25px auto;
+    position: relative;
+    z-index: 10;
+}
+
+.upload-label {
+    display: inline-block;
+    padding: 12px 30px;
+    font-size: 1em;
+    background-color: transparent;
+    color: #32de84;
+    border: 1px solid #32de84;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s;
+}
+
+.upload-label:hover {
+    background-color: rgba(50, 222, 132, 0.2);
+    box-shadow: 0 0 15px rgba(50, 222, 132, 0.5);
+}
+
+.file-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .upload-label {
+        width: 80%;
+        padding: 15px;
+        display: block;
+        margin: 0 auto;
+    }
+}
