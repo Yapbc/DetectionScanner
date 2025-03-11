@@ -49,7 +49,7 @@ const vertexShaderSource = `
     }
 `;
 
-// Fragment shader
+// Fragment shader - updated for clean output
 const fragmentShaderSource = `
     precision highp float;
     varying vec2 v_texCoord;
@@ -59,6 +59,7 @@ const fragmentShaderSource = `
         vec4 feed = texture2D(u_texture, v_texCoord);
         vec3 diff = abs(feed.rgb - u_baseColor);
         gl_FragColor = vec4(diff, 1.0);
+        // No additional effects - just the color difference filter
     }
 `;
 
@@ -128,6 +129,7 @@ startButton.addEventListener('click', () => {
         });
 });
 
+// Function to adjust video container size - Updated version
 function adjustVideoContainerSize() {
     if (video.videoWidth && video.videoHeight) {
         // Get the aspect ratio of the video
@@ -140,20 +142,21 @@ function adjustVideoContainerSize() {
         const containerWidth = videoContainer.clientWidth;
         videoContainer.style.height = containerWidth * videoAspect + 'px';
         
-        // Make the video or canvas fill the container completely
+        // Adjust canvas to match container
         if (canvas.style.display === 'block') {
             canvas.style.width = '100%';
             canvas.style.height = '100%';
-        } else {
-            video.style.width = '100%';
-            video.style.height = '100%';
+            // Update canvas resolution to match video dimensions
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
         }
+        
+        // Adjust video to match container
+        video.style.width = '100%';
+        video.style.height = '100%';
+        video.style.objectFit = 'cover';
     }
 }
-
-// Set canvas dimensions to match video
-canvas.width = video.videoWidth;
-canvas.height = video.videoHeight;
 
 // Handle color change
 colorPicker.addEventListener('input', updateBaseColor);
