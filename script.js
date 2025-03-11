@@ -16,6 +16,50 @@ if (!gl) {
 let program;
 let texture;
 
+
+// Modified fragment shader to create a Blade Runner-inspired effect
+const fragmentShaderSource = `
+    precision highp float;
+    varying vec2 v_texCoord;
+    uniform sampler2D u_texture;
+    
+    void main() {
+        vec4 feed = texture2D(u_texture, v_texCoord);
+        
+        // Convert to grayscale first
+        float gray = dot(feed.rgb, vec3(0.299, 0.587, 0.114));
+        
+        // Create a glowing green effect (similar to the baseline test)
+        vec3 greenTint = vec3(gray * 0.2, gray * 1.2, gray * 0.4);
+        
+        // Add scan lines
+        float scanLine = mod(gl_FragCoord.y, 4.0) < 2.0 ? 0.9 : 1.0;
+        
+        // Add noise/grain effect
+        float noise = fract(sin(dot(v_texCoord, vec2(12.9898, 78.233))) * 43758.5453);
+        
+        // Create subtle vignette
+        vec2 position = (v_texCoord - 0.5) * 2.0;
+        float vignette = 1.0 - dot(position, position) * 0.3;
+        
+        // Add occasional glitch effect based on time
+        float glitchIntensity = step(0.97, noise);
+        vec2 glitchOffset = vec2(noise * 0.03 * glitchIntensity, 0.0);
+        vec4 glitchFeed = texture2D(u_texture, v_texCoord + glitchOffset);
+        
+        // Combine all effects
+        vec3 finalColor = mix(greenTint, glitchFeed.rgb, glitchIntensity) * scanLine * vignette;
+        
+        // Add subtle green glow
+        finalColor += vec3(0.0, 0.1, 0.05) * (1.0 - vignette);
+        
+        gl_FragColor = vec4(finalColor, 1.0);
+    }
+`;
+
+// Insert this variable at the top of your script.js file
+// The rest of your script.js file remains unchanged
+
 // Vertex shader
 const vertexShaderSource = `
     attribute vec2 a_position;

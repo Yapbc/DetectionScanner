@@ -1,52 +1,190 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    font-family: 'Courier New', monospace;
+    background-color: #0a0a0a;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    color: #32de84;
+    overflow: hidden;
 }
 
 .container {
     text-align: center;
     width: 100%;
     max-width: 800px;
-    padding: 10px;
+    padding: 20px;
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 1px solid #32de84;
+}
+
+.container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 1;
 }
 
 h1 {
-    color: #333;
-    font-size: 1.5em;
-    margin = margin-bottom: 10px;
+    color: #fff;
+    font-size: 1.8em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    font-weight: normal;
+    text-shadow: 0 0 10px #32de84;
+}
+
+.header-text {
+    font-size: 0.8em;
+    opacity: 0.7;
+    margin-bottom: 20px;
+    text-transform: uppercase;
 }
 
 #webcam, #canvas {
     width: 100%;
     height: auto;
     max-width: 640px;
-    border: 2px solid #333;
-    border-radius: 5px;
+    border: 2px solid #32de84;
+    border-radius: 0;
     display: block;
-    margin: 0 auto;
+    margin: 0 auto 20px;
+    position: relative;
+    z-index: 0;
+    box-shadow: 0 0 20px rgba(50, 222, 132, 0.3);
 }
 
 #startButton {
-    margin: 10px auto;
-    padding: 10px 20px;
+    margin: 20px auto;
+    padding: 12px 30px;
     font-size: 1em;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
+    background-color: transparent;
+    color: #32de84;
+    border: 1px solid #32de84;
     cursor: pointer;
     display: block;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Courier New', monospace;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+#startButton:hover {
+    background-color: rgba(50, 222, 132, 0.2);
+    box-shadow: 0 0 15px rgba(50, 222, 132, 0.5);
+}
+
+#startButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 #status, #error {
-    margin-top: 10px;
-    font-size: 0.9em;
+    margin-top: 15px;
+    font-size: 1em;
+    position: relative;
+}
+
+#status {
+    color: #32de84;
+}
+
+#error {
+    color: #ff3a3a;
+}
+
+.typing-effect {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid #32de84;
+    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: #32de84 }
+}
+
+.glitch {
+    position: relative;
+}
+
+.glitch::before, .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch::before {
+    left: 2px;
+    text-shadow: -2px 0 #ff00ff;
+    animation: glitch-anim-1 2s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+    left: -2px;
+    text-shadow: 2px 0 #00ffff;
+    animation: glitch-anim-2 3s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-1 {
+    0% { clip-path: inset(20% 0 80% 0); }
+    20% { clip-path: inset(60% 0 40% 0); }
+    40% { clip-path: inset(40% 0 60% 0); }
+    60% { clip-path: inset(80% 0 20% 0); }
+    80% { clip-path: inset(10% 0 90% 0); }
+    100% { clip-path: inset(30% 0 70% 0); }
+}
+
+@keyframes glitch-anim-2 {
+    0% { clip-path: inset(15% 0 85% 0); }
+    20% { clip-path: inset(75% 0 25% 0); }
+    40% { clip-path: inset(25% 0 75% 0); }
+    60% { clip-path: inset(85% 0 15% 0); }
+    80% { clip-path: inset(5% 0 95% 0); }
+    100% { clip-path: inset(45% 0 55% 0); }
+}
+
+.scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-color: rgba(50, 222, 132, 0.5);
+    animation: scan 2s linear infinite;
+    z-index: 2;
+    pointer-events: none;
+}
+
+@keyframes scan {
+    0% { top: 0; }
+    100% { top: 100%; }
 }
 
 @media (max-width: 600px) {

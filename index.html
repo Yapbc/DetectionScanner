@@ -3,18 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mobile Webcam Scanner with Shaders</title>
+    <title>BASELINE TEST // AI DETECTOR</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Webcam Scanner</h1>
+        <div class="scan-line"></div>
+        <div class="header-text">K/D6.3-7-NEXUS:9 // BASELINE PROTOCOL</div>
+        <h1 class="glitch" data-text="VISUAL BASELINE SCANNER">VISUAL BASELINE SCANNER</h1>
+        <div class="header-text">OFFICER K/D/SIX/DASH/TEN/SEVEN/TWENTY-ONE/FOUR/TWO</div>
+        
         <video id="webcam" autoplay playsinline style="display:block; max-width:100%;"></video>
         <canvas id="canvas" style="display:none;"></canvas>
-        <button id="startButton">Start Camera</button>
-        <p id="status" style="color: blue;">Click "Start Camera" to begin</p>
+        
+        <button id="startButton">INITIATE SCAN</button>
+        
+        <p id="status" class="typing-effect">A SYSTEM OF CELLS INTERLINKED WITHIN CELLS</p>
         <p id="error" style="color: red;"></p>
     </div>
     <script src="script.js"></script>
+    <script>
+        // Additional script for the typing effect
+        const statusMessages = [
+            "CELLS WITHIN CELLS INTERLINKED",
+            "WITHIN ONE STEM. AND DREADFULLY DISTINCT",
+            "AGAINST THE DARK, A TALL WHITE FOUNTAIN PLAYED",
+            "INTERLINKED. INTERLINKED.",
+            "CELLS."
+        ];
+        
+        let messageIndex = 0;
+        
+        function updateStatusMessage() {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = statusMessages[messageIndex];
+            statusElement.classList.remove('typing-effect');
+            void statusElement.offsetWidth; // Trigger reflow
+            statusElement.classList.add('typing-effect');
+            
+            messageIndex = (messageIndex + 1) % statusMessages.length;
+        }
+        
+        // Change the status message every 5 seconds
+        setInterval(updateStatusMessage, 5000);
+    </script>
 </body>
 </html>
