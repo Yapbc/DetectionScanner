@@ -3,6 +3,7 @@ const canvas = document.getElementById('canvas');
 const startButton = document.getElementById('startButton');
 const statusDisplay = document.getElementById('status');
 const errorDisplay = document.getElementById('error');
+const videoContainer = document.querySelector('.video-container');
 
 // Add color picker input
 const colorPickerContainer = document.createElement('div');
@@ -61,12 +62,13 @@ const fragmentShaderSource = `
     }
 `;
 
-// Mobile-optimized constraints
+// Mobile-optimized constraints but with better quality
 const constraints = {
     video: {
         facingMode: { ideal: 'environment' },
-        width: { ideal: 1080 },
-        height: { ideal: 640 }
+        width: { ideal: 640 }, // Increased for better quality
+        height: { ideal: 480 }, // Increased for better quality
+        aspectRatio: 4/3  // Maintain 4:3 aspect ratio
     }
 };
 
@@ -88,14 +90,21 @@ startButton.addEventListener('click', () => {
             video.srcObject = stream;
             video.onloadedmetadata = () => {
                 console.log(`Video metadata loaded: ${video.videoWidth}x${video.videoHeight}`);
+                
+                // Set container height based on aspect ratio to prevent black bars
+                adjustVideoContainerSize();
+                
+                // Set canvas dimensions to match video
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
+                
                 statusDisplay.textContent = 'Webcam ready, starting render...';
                 video.play().then(() => {
                     console.log('Video playing');
                     if (gl) {
                         initWebGL();
                         render();
+                        // Instead of hiding video, hide it only after canvas is ready
                         video.style.display = 'none';
                         canvas.style.display = 'block';
                         
@@ -119,6 +128,33 @@ startButton.addEventListener('click', () => {
         });
 });
 
+function adjustVideoContainerSize() {
+    if (video.videoWidth && video.videoHeight) {
+        // Get the aspect ratio of the video
+        const videoAspect = video.videoHeight / video.videoWidth;
+        
+        // Set the container width to 100% of its parent
+        videoContainer.style.width = '100%';
+        
+        // Set the height based on the aspect ratio
+        const containerWidth = videoContainer.clientWidth;
+        videoContainer.style.height = containerWidth * videoAspect + 'px';
+        
+        // Make the video or canvas fill the container completely
+        if (canvas.style.display === 'block') {
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+        } else {
+            video.style.width = '100%';
+            video.style.height = '100%';
+        }
+    }
+}
+
+// Set canvas dimensions to match video
+canvas.width = video.videoWidth;
+canvas.height = video.videoHeight;
+
 // Handle color change
 colorPicker.addEventListener('input', updateBaseColor);
 
@@ -141,6 +177,9 @@ function updateBaseColor() {
         statusDisplay.textContent = `Filter updated: ${colorPicker.value}`;
     }
 }
+
+// Handle window resize to maintain aspect ratio
+window.addEventListener('resize', adjustVideoContainerSize);
 
 // Initialize WebGL
 function initWebGL() {
