@@ -35,6 +35,7 @@ if (!gl) {
 let program;
 let texture;
 let colorUniformLocation;
+let isScanning = false;
 
 // Vertex shader
 const vertexShaderSource = `
@@ -64,15 +65,20 @@ const fragmentShaderSource = `
 const constraints = {
     video: {
         facingMode: { ideal: 'environment' },
-        width: { ideal: 320 },
-        height: { ideal: 240 }
+        width: { ideal: 1080 },
+        height: { ideal: 640 }
     }
 };
 
 // Start camera on button click
 startButton.addEventListener('click', () => {
+    if (isScanning) {
+        // Already scanning, so just update the color
+        updateBaseColor();
+        return;
+    }
+    
     console.log('Start button clicked');
-    startButton.disabled = true;
     statusDisplay.textContent = 'Requesting camera access...';
     
     navigator.mediaDevices.getUserMedia(constraints)
@@ -92,6 +98,10 @@ startButton.addEventListener('click', () => {
                         render();
                         video.style.display = 'none';
                         canvas.style.display = 'block';
+                        
+                        // Change button text instead of disabling
+                        startButton.textContent = 'UPDATE FILTER';
+                        isScanning = true;
                     } else {
                         statusDisplay.textContent = 'Raw feed active (no WebGL)';
                     }
@@ -106,7 +116,6 @@ startButton.addEventListener('click', () => {
             errorDisplay.textContent = `Webcam access failed: ${err.message}`;
             statusDisplay.textContent = '';
             console.error('Webcam error:', err);
-            startButton.disabled = false;
         });
 });
 
@@ -127,6 +136,9 @@ function updateBaseColor() {
         const rgbColor = hexToRgb(colorPicker.value);
         gl.useProgram(program);
         gl.uniform3fv(colorUniformLocation, rgbColor);
+        
+        // Update status to show the color has been applied
+        statusDisplay.textContent = `Filter updated: ${colorPicker.value}`;
     }
 }
 
