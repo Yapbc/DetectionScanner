@@ -27,38 +27,16 @@ const vertexShaderSource = `
     }
 `;
 
-// Modified fragment shader to create a Blade Runner-inspired effect
+// Fragment shader
 const fragmentShaderSource = `
     precision highp float;
     varying vec2 v_texCoord;
     uniform sampler2D u_texture;
-    
     void main() {
         vec4 feed = texture2D(u_texture, v_texCoord);
-        
-        // Convert to grayscale first
-        float gray = dot(feed.rgb, vec3(0.299, 0.587, 0.114));
-        
-        // Create a glowing green effect (similar to the baseline test)
-        vec3 greenTint = vec3(gray * 0.2, gray * 1.2, gray * 0.4);
-        
-        // Add scan lines
-        float scanLine = mod(gl_FragCoord.y, 4.0) < 2.0 ? 0.9 : 1.0;
-        
-        // Add noise/grain effect
-        float noise = fract(sin(dot(v_texCoord, vec2(12.9898, 78.233))) * 43758.5453);
-        
-        // Create subtle vignette
-        vec2 position = (v_texCoord - 0.5) * 2.0;
-        float vignette = 1.0 - dot(position, position) * 0.3;
-        
-        // Combine all effects
-        vec3 finalColor = greenTint * scanLine * vignette;
-        
-        // Add subtle green glow
-        finalColor += vec3(0.0, 0.1, 0.05) * (1.0 - vignette);
-        
-        gl_FragColor = vec4(finalColor, 1.0);
+        vec3 yellow = vec3(1.0, 1.0, 0.0);
+        vec3 diff = abs(feed.rgb - yellow);
+        gl_FragColor = vec4(diff, 1.0);
     }
 `;
 
@@ -75,18 +53,18 @@ const constraints = {
 startButton.addEventListener('click', () => {
     console.log('Start button clicked');
     startButton.disabled = true;
-    statusDisplay.textContent = 'CELLS INTERLINKED. INITIATING SCAN...';
+    statusDisplay.textContent = 'Requesting camera access...';
     
     navigator.mediaDevices.getUserMedia(constraints)
         .then(stream => {
             console.log('Camera access granted');
-            statusDisplay.textContent = 'CELLS INTERLINKED. CALIBRATING...';
+            statusDisplay.textContent = 'Webcam accessed, initializing...';
             video.srcObject = stream;
             video.onloadedmetadata = () => {
                 console.log(`Video metadata loaded: ${video.videoWidth}x${video.videoHeight}`);
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
-                statusDisplay.textContent = 'CELLS WITHIN CELLS. BASELINE ACTIVE.';
+                statusDisplay.textContent = 'Webcam ready, starting render...';
                 video.play().then(() => {
                     console.log('Video playing');
                     if (gl) {
@@ -95,7 +73,7 @@ startButton.addEventListener('click', () => {
                         video.style.display = 'none';
                         canvas.style.display = 'block';
                     } else {
-                        statusDisplay.textContent = 'RAW FEED ACTIVE (NO BASELINE FILTER)';
+                        statusDisplay.textContent = 'Raw feed active (no WebGL)';
                     }
                 }).catch(err => {
                     errorDisplay.textContent = `Video play failed: ${err.message}`;
@@ -105,7 +83,7 @@ startButton.addEventListener('click', () => {
             };
         })
         .catch(err => {
-            errorDisplay.textContent = `Baseline scanner access failed: ${err.message}`;
+            errorDisplay.textContent = `Webcam access failed: ${err.message}`;
             statusDisplay.textContent = '';
             console.error('Webcam error:', err);
             startButton.disabled = false;
@@ -146,7 +124,7 @@ function initWebGL() {
     gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 16, 8);
 
     gl.uniform1i(gl.getUniformLocation(program, 'u_texture'), 0);
-    statusDisplay.textContent = 'CELLS. INTERLINKED. WITHIN CELLS.';
+    statusDisplay.textContent = 'WebGL initialized, rendering...';
     console.log('WebGL initialized');
 }
 
