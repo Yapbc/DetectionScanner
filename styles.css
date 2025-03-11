@@ -55,7 +55,7 @@ h1 {
 }
 
 #webcam, #canvas {
-    /* width: 100%; */
+    width: 100%;
     height: auto;
     max-width: 100%;
     max-height: 50vh; /* Limit height to ensure controls remain visible */
