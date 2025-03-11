@@ -16,6 +16,16 @@ if (!gl) {
 let program;
 let texture;
 
+// Vertex shader
+const vertexShaderSource = `
+    attribute vec2 a_position;
+    attribute vec2 a_texCoord;
+    varying vec2 v_texCoord;
+    void main() {
+        gl_Position = vec4(a_position, 0.0, 1.0);
+        v_texCoord = a_texCoord;
+    }
+`;
 
 // Modified fragment shader to create a Blade Runner-inspired effect
 const fragmentShaderSource = `
@@ -42,45 +52,13 @@ const fragmentShaderSource = `
         vec2 position = (v_texCoord - 0.5) * 2.0;
         float vignette = 1.0 - dot(position, position) * 0.3;
         
-        // Add occasional glitch effect based on time
-        float glitchIntensity = step(0.97, noise);
-        vec2 glitchOffset = vec2(noise * 0.03 * glitchIntensity, 0.0);
-        vec4 glitchFeed = texture2D(u_texture, v_texCoord + glitchOffset);
-        
         // Combine all effects
-        vec3 finalColor = mix(greenTint, glitchFeed.rgb, glitchIntensity) * scanLine * vignette;
+        vec3 finalColor = greenTint * scanLine * vignette;
         
         // Add subtle green glow
         finalColor += vec3(0.0, 0.1, 0.05) * (1.0 - vignette);
         
         gl_FragColor = vec4(finalColor, 1.0);
-    }
-`;
-
-// Insert this variable at the top of your script.js file
-// The rest of your script.js file remains unchanged
-
-// Vertex shader
-const vertexShaderSource = `
-    attribute vec2 a_position;
-    attribute vec2 a_texCoord;
-    varying vec2 v_texCoord;
-    void main() {
-        gl_Position = vec4(a_position, 0.0, 1.0);
-        v_texCoord = a_texCoord;
-    }
-`;
-
-// Fragment shader
-const fragmentShaderSource = `
-    precision highp float;
-    varying vec2 v_texCoord;
-    uniform sampler2D u_texture;
-    void main() {
-        vec4 feed = texture2D(u_texture, v_texCoord);
-        vec3 yellow = vec3(1.0, 1.0, 0.0);
-        vec3 diff = abs(feed.rgb - yellow);
-        gl_FragColor = vec4(diff, 1.0);
     }
 `;
 
@@ -97,18 +75,18 @@ const constraints = {
 startButton.addEventListener('click', () => {
     console.log('Start button clicked');
     startButton.disabled = true;
-    statusDisplay.textContent = 'Requesting camera access...';
+    statusDisplay.textContent = 'CELLS INTERLINKED. INITIATING SCAN...';
     
     navigator.mediaDevices.getUserMedia(constraints)
         .then(stream => {
             console.log('Camera access granted');
-            statusDisplay.textContent = 'Webcam accessed, initializing...';
+            statusDisplay.textContent = 'CELLS INTERLINKED. CALIBRATING...';
             video.srcObject = stream;
             video.onloadedmetadata = () => {
                 console.log(`Video metadata loaded: ${video.videoWidth}x${video.videoHeight}`);
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
-                statusDisplay.textContent = 'Webcam ready, starting render...';
+                statusDisplay.textContent = 'CELLS WITHIN CELLS. BASELINE ACTIVE.';
                 video.play().then(() => {
                     console.log('Video playing');
                     if (gl) {
@@ -117,7 +95,7 @@ startButton.addEventListener('click', () => {
                         video.style.display = 'none';
                         canvas.style.display = 'block';
                     } else {
-                        statusDisplay.textContent = 'Raw feed active (no WebGL)';
+                        statusDisplay.textContent = 'RAW FEED ACTIVE (NO BASELINE FILTER)';
                     }
                 }).catch(err => {
                     errorDisplay.textContent = `Video play failed: ${err.message}`;
@@ -127,7 +105,7 @@ startButton.addEventListener('click', () => {
             };
         })
         .catch(err => {
-            errorDisplay.textContent = `Webcam access failed: ${err.message}`;
+            errorDisplay.textContent = `Baseline scanner access failed: ${err.message}`;
             statusDisplay.textContent = '';
             console.error('Webcam error:', err);
             startButton.disabled = false;
@@ -168,7 +146,7 @@ function initWebGL() {
     gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 16, 8);
 
     gl.uniform1i(gl.getUniformLocation(program, 'u_texture'), 0);
-    statusDisplay.textContent = 'WebGL initialized, rendering...';
+    statusDisplay.textContent = 'CELLS. INTERLINKED. WITHIN CELLS.';
     console.log('WebGL initialized');
 }
 
