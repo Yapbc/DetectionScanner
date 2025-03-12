@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const colorPickerLabel = document.createElement('label');
     colorPickerLabel.setAttribute('for', 'colorPicker');
-    colorPickerLabel.textContent = 'BASELINE COLOR:';
+    colorPickerLabel.textContent = 'BASE COLOR:';
     
     const colorPicker = document.createElement('input');
     colorPicker.type = 'color';

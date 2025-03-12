@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BASELINE TEST // AI DETECTOR</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div class="container">
         <!-- <div class="scan-line"></div> -->
-        <div class="header-text">K/D6.3-7-NEXUS:9 // BASELINE PROTOCOL</div>
+        <div class="header-text">SINGAPORE:2030 // BASELINE PROTOCOL</div>
         <h1>VISUAL BASELINE SCANNER</h1>
-        <div class="header-text">OFFICER K/D/SIX/DASH/TEN/SEVEN/TWENTY-ONE/FOUR/TWO</div>
-        
+        <div class="header-text">USE THE SCANNER ON THE IMAGE THAT YOU WANT TO IDENTIFY.</div>
+        <div class="scrolling-disclaimer"></div>
+
+
         <!-- Video container with no glitch effects -->
         <div class="video-container">
             <div class="scan-line"></div>
@@ -20,22 +24,23 @@
             <canvas id="canvas" style="display:none;"></canvas>
             <img id="uploadedImage" style="display:none; width:100%; height:100%; object-fit:cover;">
         </div>
-        
+
         <div class="controls-container">
             <button id="startButton">INITIATE SCAN</button>
             <!-- Color picker will be added here via JavaScript -->
         </div>
-        
+
         <!-- Add file upload option -->
         <div class="upload-container">
             <label for="imageUpload" class="upload-label">OR UPLOAD IMAGE</label>
             <input type="file" id="imageUpload" accept="image/*" class="file-input">
         </div>
-        
-        <p id="status">CELLS INTERLINKED. CLICK "INITIATE SCAN" TO BEGIN</p>
+
+        <p id="status">CLICK "INITIATE SCAN" TO BEGIN</p>
         <p id="error" style="color: #ff3a3a;"></p>
     </div>
     <script src="script.js"></script>
     <script src="upload.js"></script>
 </body>
+
 </html>

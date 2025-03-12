@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Courier New', monospace;
-    background-color: #0a0a0a;
+    background-color: #cbcbcb;
     color: #32de84;
     overflow-y: auto;
     min-height: 100vh;
@@ -26,13 +26,11 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.15),
-        rgba(0, 0, 0, 0.15) 1px,
-        transparent 1px,
-        transparent 2px
-    );
+    background: repeating-linear-gradient(0deg,
+            rgba(0, 0, 0, 0.15),
+            rgba(0, 0, 0, 0.15) 1px,
+            transparent 1px,
+            transparent 2px);
     pointer-events: none;
     z-index: 1;
 }
@@ -54,6 +52,42 @@ h1 {
     text-transform: uppercase;
 }
 
+/* Scrolling disclaimer styles */
+.scrolling-disclaimer {
+    position: relative;
+    width: 100%;
+    height: 24px;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(50, 222, 132, 0.5);
+    color: #32de84;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    margin-top: -10px;
+}
+
+.scrolling-disclaimer::before {
+    content: "DISCLAIMER: THE SCANNER DOES NOT PROVIDE ANY GUARANTEE OF ACCURACY. USERS ARE RESPONSIBLE FOR THEIR OWN JUDGEMENT. // ";
+    position: absolute;
+    animation: scroll-text 15s linear infinite;
+    padding-right: 500px;
+    color: #de5432;
+    /* Add padding to separate the repeating text */
+}
+
+@keyframes scroll-text {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+
+
 /* Video container with proper aspect ratio and clean display */
 .video-container {
     width: 100%;
@@ -62,8 +96,10 @@ h1 {
     margin: 0 auto 20px;
     border: 2px solid #32de84;
     box-shadow: 0 0 20px rgba(50, 222, 132, 0.3);
-    background-color: #000; /* Black background */
-    max-height: 60vh; /* Limit maximum height */
+    background-color: #000;
+    /* Black background */
+    max-height: 60vh;
+    /* Limit maximum height */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -72,18 +108,21 @@ h1 {
     z-index: 5;
 }
 
-#webcam, #canvas {
+#webcam,
+#canvas {
     width: 100%;
     height: 100%;
     display: block;
     margin: 0 auto;
-    object-fit: cover; /* Change from contain to cover */
+    object-fit: cover;
+    /* Change from contain to cover */
 }
 
 /* Clear zone without glitch effects */
 .video-container::before,
 .video-container::after {
-    display: none; /* Remove any inherited glitch effects */
+    display: none;
+    /* Remove any inherited glitch effects */
 }
 
 .controls-container {
@@ -121,7 +160,8 @@ h1 {
     cursor: not-allowed;
 }
 
-#status, #error {
+#status,
+#error {
     margin-top: 15px;
     font-size: 1em;
     position: relative;
@@ -143,20 +183,33 @@ h1 {
 }
 
 @keyframes typing {
-    from { width: 0 }
-    to { width: 100% }
+    from {
+        width: 0
+    }
+
+    to {
+        width: 100%
+    }
 }
 
 @keyframes blink-caret {
-    from, to { border-color: transparent }
-    50% { border-color: #32de84 }
+
+    from,
+    to {
+        border-color: transparent
+    }
+
+    50% {
+        border-color: #32de84
+    }
 }
 
 .glitch {
     position: relative;
 }
 
-.glitch::before, .glitch::after {
+.glitch::before,
+.glitch::after {
     content: attr(data-text);
     position: absolute;
     top: 0;
@@ -178,21 +231,55 @@ h1 {
 }
 
 @keyframes glitch-anim-1 {
-    0% { clip-path: inset(20% 0 80% 0); }
-    20% { clip-path: inset(60% 0 40% 0); }
-    40% { clip-path: inset(40% 0 60% 0); }
-    60% { clip-path: inset(80% 0 20% 0); }
-    80% { clip-path: inset(10% 0 90% 0); }
-    100% { clip-path: inset(30% 0 70% 0); }
+    0% {
+        clip-path: inset(20% 0 80% 0);
+    }
+
+    20% {
+        clip-path: inset(60% 0 40% 0);
+    }
+
+    40% {
+        clip-path: inset(40% 0 60% 0);
+    }
+
+    60% {
+        clip-path: inset(80% 0 20% 0);
+    }
+
+    80% {
+        clip-path: inset(10% 0 90% 0);
+    }
+
+    100% {
+        clip-path: inset(30% 0 70% 0);
+    }
 }
 
 @keyframes glitch-anim-2 {
-    0% { clip-path: inset(15% 0 85% 0); }
-    20% { clip-path: inset(75% 0 25% 0); }
-    40% { clip-path: inset(25% 0 75% 0); }
-    60% { clip-path: inset(85% 0 15% 0); }
-    80% { clip-path: inset(5% 0 95% 0); }
-    100% { clip-path: inset(45% 0 55% 0); }
+    0% {
+        clip-path: inset(15% 0 85% 0);
+    }
+
+    20% {
+        clip-path: inset(75% 0 25% 0);
+    }
+
+    40% {
+        clip-path: inset(25% 0 75% 0);
+    }
+
+    60% {
+        clip-path: inset(85% 0 15% 0);
+    }
+
+    80% {
+        clip-path: inset(5% 0 95% 0);
+    }
+
+    100% {
+        clip-path: inset(45% 0 55% 0);
+    }
 }
 
 /* Make sure no scan line appears in the video container */
@@ -214,8 +301,13 @@ h1 {
 }
 
 @keyframes scan {
-    0% { top: 0; }
-    100% { top: 100%; }
+    0% {
+        top: 0;
+    }
+
+    100% {
+        top: 100%;
+    }
 }
 
 /* Color picker styling */
@@ -269,22 +361,24 @@ label[for="colorPicker"] {
     body {
         padding-bottom: 70px;
     }
-    
+
     h1 {
         font-size: 1.2em;
     }
-    
+
     .video-container {
         height: auto;
-        min-height: 200px; /* Minimum height on mobile */
-        max-height: 40vh; /* Smaller maximum height on mobile */
+        min-height: 200px;
+        /* Minimum height on mobile */
+        max-height: 40vh;
+        /* Smaller maximum height on mobile */
     }
-    
+
     #startButton {
         width: 80%;
         padding: 15px;
     }
-    
+
     .color-picker-container {
         flex-direction: row;
         align-items: center;
@@ -295,7 +389,7 @@ label[for="colorPicker"] {
         border-top: 1px solid #32de84;
         margin-bottom: 0;
     }
-    
+
     #colorPicker {
         width: 50px;
         height: 50px;
@@ -351,9 +445,9 @@ label[for="colorPicker"] {
 
 .camera-switch-container {
     margin-top: 10px;
-  }
-  
-  #switchCameraButton {
+}
+
+#switchCameraButton {
     background-color: #4CAF50;
     color: white;
     padding: 8px 16px;
@@ -365,11 +459,11 @@ label[for="colorPicker"] {
     cursor: pointer;
     border: none;
     border-radius: 4px;
-  }
-  
-  #switchCameraButton:hover {
+}
+
+#switchCameraButton:hover {
     background-color: #45a049;
-  }
+}
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
