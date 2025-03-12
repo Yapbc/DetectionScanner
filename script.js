@@ -29,6 +29,73 @@ document.addEventListener('DOMContentLoaded', function() {
     const controlsContainer = document.querySelector('.controls-container');
     controlsContainer.appendChild(colorPickerContainer);
     
+    // Add camera switch button for mobile devices
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    let currentFacingMode = 'environment'; // Start with back camera
+    
+    if (isMobile) {
+        const cameraSwitchContainer = document.createElement('div');
+        cameraSwitchContainer.className = 'camera-switch-container';
+        
+        const switchCameraButton = document.createElement('button');
+        switchCameraButton.id = 'switchCameraButton';
+        switchCameraButton.textContent = 'SWITCH CAMERA';
+        switchCameraButton.className = 'control-button';
+        switchCameraButton.style.display = 'none'; // Initially hidden
+        
+        cameraSwitchContainer.appendChild(switchCameraButton);
+        controlsContainer.appendChild(cameraSwitchContainer);
+        
+        // Add event listener for camera switch button
+        switchCameraButton.addEventListener('click', switchCamera);
+    }
+    
+    // Function to switch between front and back cameras on mobile devices
+    function switchCamera() {
+        if (!isMobile) return; // Only works on mobile
+        
+        // Toggle facing mode
+        currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+        
+        // Update status display
+        statusDisplay.textContent = `SWITCHING TO ${currentFacingMode === 'environment' ? 'BACK' : 'FRONT'} CAMERA...`;
+        
+        // Stop current stream
+        if (videoElement.srcObject) {
+            const tracks = videoElement.srcObject.getTracks();
+            tracks.forEach(track => track.stop());
+        }
+        
+        // Start new stream with different camera
+        navigator.mediaDevices.getUserMedia({
+            video: { facingMode: currentFacingMode }
+        })
+        .then(function(stream) {
+            videoElement.srcObject = stream;
+            videoElement.onloadedmetadata = function() {
+                // Set the canvas size to match the video
+                canvasElement.width = videoElement.videoWidth;
+                canvasElement.height = videoElement.videoHeight;
+                
+                // Adjust container size
+                adjustVideoContainerForVideo();
+                
+                // Show video feed
+                videoElement.style.display = 'block';
+                canvasElement.style.display = 'none';
+                
+                statusDisplay.textContent = `CAMERA ACTIVE (${currentFacingMode === 'environment' ? 'BACK' : 'FRONT'}). SCANNING...`;
+                
+                // Restart the render loop
+                requestAnimationFrame(render);
+            };
+        })
+        .catch(function(error) {
+            errorDisplay.textContent = 'Error switching camera: ' + error.message;
+            statusDisplay.textContent = '';
+        });
+    }
+    
     // WebGL variables
     let gl, program, colorUniformLocation, texture;
     
@@ -37,8 +104,26 @@ document.addEventListener('DOMContentLoaded', function() {
         return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
     }
     
-    // Initialize webcam
+    // Modify existing startButton event listener to include facing mode and show switch button
     startButton.addEventListener('click', function() {
+        if (videoElement.srcObject) {
+            // If we have a stream, stop it
+            const tracks = videoElement.srcObject.getTracks();
+            tracks.forEach(track => track.stop());
+            videoElement.srcObject = null;
+            
+            // Update UI
+            startButton.textContent = 'START SCAN';
+            statusDisplay.textContent = 'SCAN STOPPED';
+            
+            // Hide switch camera button
+            if (isMobile) {
+                document.getElementById('switchCameraButton').style.display = 'none';
+            }
+            
+            return;
+        }
+        
         if (!hasGetUserMedia()) {
             errorDisplay.textContent = 'Camera access not supported by your browser.';
             return;
@@ -54,8 +139,13 @@ document.addEventListener('DOMContentLoaded', function() {
         videoElement.style.display = 'block';
         canvasElement.style.display = 'none';
         
+        // Configure camera options for mobile
+        const videoConstraints = isMobile ? 
+            { facingMode: currentFacingMode } : 
+            { facingMode: 'user' };
+        
         // Access the webcam
-        navigator.mediaDevices.getUserMedia({ video: true })
+        navigator.mediaDevices.getUserMedia({ video: videoConstraints })
             .then(function(stream) {
                 videoElement.srcObject = stream;
                 videoElement.onloadedmetadata = function() {
@@ -69,7 +159,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Initialize WebGL once we have the video stream
                     initWebGL();
                     
-                    statusDisplay.textContent = 'CAMERA ACTIVE. SCANNING...';
+                    // Show camera switch button on mobile
+                    if (isMobile) {
+                        document.getElementById('switchCameraButton').style.display = 'block';
+                    }
+                    
+                    statusDisplay.textContent = `CAMERA ACTIVE (${currentFacingMode === 'environment' ? 'BACK' : 'FRONT'}). SCANNING...`;
                     startButton.textContent = 'STOP SCAN';
                     
                     // Start the render loop
@@ -81,6 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusDisplay.textContent = '';
             });
     });
+
     
     // Process uploaded image
     imageUpload.addEventListener('change', function(e) {
