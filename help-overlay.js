@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
         {
             title: "STEP 2: SELECT BASE COLOR",
             image: "/image/step2_basecolor.jpg",
-            description: "Use the color picker to select a base color for comparison. The scanner will highlight differences upon scanning the image that you want to identify. Do note that different environment and lighting will require a change in base color, therefore you can change the color accordingly."
+            description: "Use the color picker to select a base color for comparison. The scanner will highlight differences upon scanning the image that you want to identify. NOTE: Different environment and lighting will require a change in base color, therefore you can change the color accordingly."
         },
         {
             title: "STEP 3: ANALYZE RESULTS",

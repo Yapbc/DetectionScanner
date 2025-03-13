@@ -637,9 +637,9 @@ label[for="colorPicker"] {
         align-items: center;
         position: sticky;
         bottom: 20px;
-        background-color: rgba(0, 0, 0, 0.8);
+        /* background-color: rgba(0, 0, 0, 0.8); */
         padding: 10px;
-        border-top: 1px solid #32de84;
+        /* border-top: 1px solid #32de84; */
         margin-bottom: 0;
     }
 
