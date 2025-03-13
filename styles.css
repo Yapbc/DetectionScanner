@@ -60,7 +60,8 @@ h1 {
     overflow: hidden;
     white-space: nowrap;
     margin-bottom: 15px;
-    border-bottom: 1px solid rgba(50, 222, 132, 0.5);
+    border: 2px solid rgba(222, 50, 50, 0.9);
+    background-color: #000000;
     color: #32de84;
     font-size: 0.9em;
     text-transform: uppercase;
@@ -139,6 +140,7 @@ h1 {
     background-color: transparent;
     color: #32de84;
     border: 1px solid #32de84;
+    border-radius: 20em;
     cursor: pointer;
     display: block;
     text-transform: uppercase;
@@ -325,6 +327,7 @@ h1 {
     height: 40px;
     width: 40px;
     border: 1px solid #32de84;
+    border-radius: 20em;
     background: none;
     padding: 0;
     cursor: pointer;
@@ -355,6 +358,256 @@ label[for="colorPicker"] {
     letter-spacing: 1px;
     text-transform: uppercase;
 }
+
+
+
+/* File upload styling */
+.upload-container {
+    margin: 25px auto;
+    position: relative;
+    z-index: 10;
+}
+
+.upload-label {
+    display: inline-block;
+    padding: 12px 30px;
+    font-size: 1em;
+    background-color: transparent;
+    color: #32de84;
+    border: 1px solid #32de84;
+    border-radius: 20em;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s;
+}
+
+.upload-label:hover {
+    background-color: rgba(50, 222, 132, 0.2);
+    box-shadow: 0 0 15px rgba(50, 222, 132, 0.5);
+}
+
+.file-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+
+.camera-switch-container {
+    margin-top: 10px;
+}
+
+#switchCameraButton {
+    background-color: #4CAF50;
+    border-radius: 20em;
+    color: white;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+}
+
+#switchCameraButton:hover {
+    background-color: #45a049;
+}
+
+
+
+
+/* Create a new CSS file called help-overlay.css */
+
+/* Sticky Help Button */
+#helpButton {
+    position: fixed;
+    right: 20px;
+    bottom: 50%;
+    transform: translateY(50%);
+    width: 50px;
+    height: 50px;
+    background-color: #32de84;
+    color: #000;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(50, 222, 132, 0.5);
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s;
+}
+
+#helpButton:hover {
+    background-color: #28b36d;
+    box-shadow: 0 0 20px rgba(50, 222, 132, 0.8);
+}
+
+/* Help Overlay */
+.help-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+}
+
+.help-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.help-content {
+    background-color: #000;
+    border: 2px solid #32de84;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    padding: 30px;
+    position: relative;
+    color: #32de84;
+    font-family: 'Courier New', monospace;
+    overflow-y: auto;
+    box-shadow: 0 0 30px rgba(50, 222, 132, 0.3);
+}
+
+.help-content::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(0deg,
+            rgba(255, 255, 255, 0.05),
+            rgba(208, 208, 208, 0.05) 1px,
+            transparent 1px,
+            transparent 2px);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background-color: transparent;
+    border: 1px solid #32de84;
+    color: #32de84;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.close-button:hover {
+    background-color: rgba(50, 222, 132, 0.2);
+}
+
+/* Content Styling */
+.help-content h2 {
+    text-align: center;
+    color: #fff;
+    font-size: 1.5em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    font-weight: normal;
+    text-shadow: 0 0 10px #32de84;
+}
+
+.help-content h3 {
+    color: #32de84;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 10px 0;
+}
+
+.step-container {
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid rgba(50, 222, 132, 0.3);
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.step-image-container {
+    text-align: center;
+    margin: 15px 0;
+}
+
+.step-image {
+    max-width: 100%;
+    border: 1px solid #32de84;
+}
+
+.tech-note {
+    margin-top: 20px;
+    padding: 15px;
+    border-top: 1px solid rgba(50, 222, 132, 0.5);
+}
+
+.tech-note p {
+    opacity: 0.7;
+    font-size: 0.9em;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+   
+}
+
+/* Scan line effect in overlay */
+/* .help-content::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-color: rgba(50, 222, 132, 0.3);
+    animation: scan 4s linear infinite;
+    z-index: 1;
+    pointer-events: none;
+}
+
+@keyframes scan {
+    0% {
+        top: 0;
+    }
+    100% {
+        top: 100%;
+    }
+} */
+
+
+
 
 /* Mobile responsiveness with different sizing */
 @media (max-width: 600px) {
@@ -394,6 +647,35 @@ label[for="colorPicker"] {
         width: 50px;
         height: 50px;
     }
+
+    .upload-label {
+        width: 80%;
+        padding: 15px;
+        display: block;
+        margin: 0 auto;
+    }
+
+
+    #helpButton {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        right: 10px;
+    }
+    
+    .help-content {
+        padding: 20px 15px;
+    }
+    
+    .help-content h2 {
+        font-size: 1.2em;
+    }
+    
+    .help-content h3 {
+        font-size: 1em;
+    }
+
+
 }
 
 /* Help address the iOS color picker issue */
@@ -405,72 +687,7 @@ label[for="colorPicker"] {
         padding: 15px;
         z-index: 100;
     }
-}
-
-/* File upload styling */
-.upload-container {
-    margin: 25px auto;
-    position: relative;
-    z-index: 10;
-}
-
-.upload-label {
-    display: inline-block;
-    padding: 12px 30px;
-    font-size: 1em;
-    background-color: transparent;
-    color: #32de84;
-    border: 1px solid #32de84;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-family: 'Courier New', monospace;
-    transition: all 0.3s;
-}
-
-.upload-label:hover {
-    background-color: rgba(50, 222, 132, 0.2);
-    box-shadow: 0 0 15px rgba(50, 222, 132, 0.5);
-}
-
-.file-input {
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    z-index: -1;
-}
 
 
-.camera-switch-container {
-    margin-top: 10px;
-}
-
-#switchCameraButton {
-    background-color: #4CAF50;
-    color: white;
-    padding: 8px 16px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 14px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border: none;
-    border-radius: 4px;
-}
-
-#switchCameraButton:hover {
-    background-color: #45a049;
-}
-
-/* Responsive adjustments */
-@media (max-width: 600px) {
-    .upload-label {
-        width: 80%;
-        padding: 15px;
-        display: block;
-        margin: 0 auto;
-    }
+    
 }
