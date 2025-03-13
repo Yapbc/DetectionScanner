@@ -530,6 +530,14 @@ label[for="colorPicker"] {
     background-color: rgba(50, 222, 132, 0.2);
 }
 
+
+
+
+
+
+
+
+
 /* Content Styling */
 .help-content h2 {
     text-align: center;
@@ -577,6 +585,66 @@ label[for="colorPicker"] {
     opacity: 0.7;
     font-size: 0.9em;
 }
+
+
+
+
+
+
+
+
+
+
+
+/* Custom scrollbar styling */
+/* For Webkit browsers (Chrome, Safari, newer versions of Opera) */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+  border: 1px solid rgba(50, 222, 132, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #111111;
+  border: 1px solid #32de84;
+  box-shadow: 0 0 5px rgba(50, 222, 132, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #1a1a1a;
+  box-shadow: 0 0 8px rgba(50, 222, 132, 0.8);
+}
+
+::-webkit-scrollbar-corner {
+  background: #000000;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #32de84 #000000;
+}
+
+/* For the help overlay, which already has a scrollbar */
+.help-content {
+  scrollbar-width: thin;
+  scrollbar-color: #32de84 #000000;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 /* Mobile Responsiveness */
 @media (max-width: 600px) {

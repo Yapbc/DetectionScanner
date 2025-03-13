@@ -18,8 +18,18 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         {
             title: "STEP 3: ANALYZE RESULTS",
-            image: "/api/placeholder/300/200",
-            description: "Areas with visual anomalies will appear differently colored based on their deviation from the base color."
+            image: "/image/step3_example.jpg",
+            description: "Check for anomalies such as skin texture overly smooth. Prominent tell-tale sign, are the inconsistency in the lighting for AI-generated images."
+        },
+        {
+            title: "STEP 4: MORE EXAMPLES",
+            image: "/image/step3_example2.jpg",
+            description: "This is another example for identification of humans, look out for the inconsistency in the lightings."
+        },
+        {
+            title: "STEP 4: NON-HUMAN EXAMPLES",
+            image: "/image/step3_example2.jpg",
+            description: "For non-human images, the scanner will highlight artifacts caused by imperfection in AI-generated visuals. Look out for the distorted text in building skylines or any form of signages that consist of illegible wordings."
         },
         {
             title: "ALTERNATE: UPLOAD IMAGE",
@@ -45,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // Overlay title
-    const OVERLAY_TITLE = "HOW TO USE THE SCANNER";
+    const OVERLAY_TITLE = "USER GUIDE & TIPS ON IDENTIFICATION";
     // ======================================================
     // END OF EDITABLE CONFIGURATION
     // ======================================================
