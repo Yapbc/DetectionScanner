@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         {
             title: "STEP 4: NON-HUMAN EXAMPLES",
-            image: "/image/step3_example2.jpg",
+            image: "/image/step3_example3.jpg",
             description: "For non-human images, the scanner will highlight artifacts caused by imperfection in AI-generated visuals. Look out for the distorted text in building skylines or any form of signages that consist of illegible wordings."
         },
         {

@@ -1,3 +1,7 @@
+///////THIS IS WITHOUT ARTIFACT THRESHOLD & ADVANCED DETECTION MODE//////////////////////////////////
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
     // Get DOM elements
     const imageUpload = document.getElementById('imageUpload');
@@ -28,175 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Insert color picker after controls container
     const controlsContainer = document.querySelector('.controls-container');
     controlsContainer.appendChild(colorPickerContainer);
-    
-    // ADD NEW CODE: Create shader selector
-    const shaderSelectorContainer = document.createElement('div');
-    shaderSelectorContainer.className = 'shader-selector-container';
-    
-    const shaderSelectorLabel = document.createElement('label');
-    shaderSelectorLabel.setAttribute('for', 'shaderSelector');
-    shaderSelectorLabel.textContent = 'FILTER MODE:';
-    
-    const shaderSelector = document.createElement('select');
-    shaderSelector.id = 'shaderSelector';
-    
-    // Add shader options
-    const shaderOptions = [
-        { value: 'basic', text: 'Basic Difference' },
-        { value: 'highlight', text: 'Highlight Artifacts' },
-        { value: 'advanced', text: 'Advanced Detection' }
-    ];
-    
-    shaderOptions.forEach(option => {
-        const optionElement = document.createElement('option');
-        optionElement.value = option.value;
-        optionElement.textContent = option.text;
-        shaderSelector.appendChild(optionElement);
-    });
-    
-    shaderSelectorContainer.appendChild(shaderSelectorLabel);
-    shaderSelectorContainer.appendChild(shaderSelector);
-    
-    // Add threshold slider for advanced modes
-    const thresholdContainer = document.createElement('div');
-    thresholdContainer.className = 'threshold-container';
-    thresholdContainer.style.display = 'none'; // Initially hidden
-    
-    const thresholdLabel = document.createElement('label');
-    thresholdLabel.setAttribute('for', 'thresholdSlider');
-    thresholdLabel.textContent = 'THRESHOLD:';
-    
-    const thresholdSlider = document.createElement('input');
-    thresholdSlider.type = 'range';
-    thresholdSlider.id = 'thresholdSlider';
-    thresholdSlider.min = '0.01';
-    thresholdSlider.max = '0.3';
-    thresholdSlider.step = '0.01';
-    thresholdSlider.value = '0.15';
-    
-    const thresholdValue = document.createElement('span');
-    thresholdValue.id = 'thresholdValue';
-    thresholdValue.textContent = '0.15';
-    
-    thresholdContainer.appendChild(thresholdLabel);
-    thresholdContainer.appendChild(thresholdSlider);
-    thresholdContainer.appendChild(thresholdValue);
-    
-    // Add the new controls to the container
-    controlsContainer.appendChild(shaderSelectorContainer);
-    controlsContainer.appendChild(thresholdContainer);
-    
-    // Show/hide threshold based on shader selection
-    shaderSelector.addEventListener('change', function() {
-        if (this.value === 'basic') {
-            thresholdContainer.style.display = 'none';
-        } else {
-            thresholdContainer.style.display = 'block';
-        }
-        
-        // Update shader if already scanning
-        if (gl && program) {
-            updateShader();
-        }
-    });
-    
-    // Update threshold value display
-    thresholdSlider.addEventListener('input', function() {
-        thresholdValue.textContent = this.value;
-        
-        // Update threshold in shader if active
-        if (gl && program) {
-            gl.useProgram(program);
-            const thresholdLocation = gl.getUniformLocation(program, 'u_threshold');
-            if (thresholdLocation) {
-                gl.uniform1f(thresholdLocation, parseFloat(this.value));
-            }
-        }
-    });
-    
-    // ADD NEW CODE: Store shader sources
-    const shaderSources = {
-        basic: `
-            precision highp float;
-            varying vec2 v_texCoord;
-            uniform sampler2D u_texture;
-            uniform vec3 u_baseColor;
-            void main() {
-                vec4 feed = texture2D(u_texture, v_texCoord);
-                vec3 diff = abs(feed.rgb - u_baseColor);
-                gl_FragColor = vec4(diff, 1.0);
-            }
-        `,
-        highlight: `
-            precision highp float;
-            varying vec2 v_texCoord;
-            uniform sampler2D u_texture;
-            uniform vec3 u_baseColor;
-            uniform float u_threshold;
-            
-            void main() {
-                vec4 feed = texture2D(u_texture, v_texCoord);
-                vec3 diff = abs(feed.rgb - u_baseColor);
-                
-                // Calculate difference intensity
-                float intensity = (diff.r + diff.g + diff.b) / 3.0;
-                
-                // Apply threshold to isolate significant differences
-                float threshold = u_threshold; // Using uniform from slider
-                
-                if (intensity > threshold) {
-                    // Highlight artifacts - use a distinctive color
-                    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); // Red for artifacts
-                } else {
-                    // Keep original pixels with slight transparency
-                    gl_FragColor = vec4(feed.rgb, 0.2);
-                }
-            }
-        `,
-        advanced: `
-            precision highp float;
-            varying vec2 v_texCoord;
-            uniform sampler2D u_texture;
-            uniform vec3 u_baseColor;
-            uniform float u_threshold;
-            
-            void main() {
-                vec2 texSize = vec2(${canvasElement.width}.0, ${canvasElement.height}.0);
-                vec2 onePixel = vec2(1.0, 1.0) / texSize;
-                
-                // Sample neighboring pixels
-                vec4 center = texture2D(u_texture, v_texCoord);
-                vec4 left = texture2D(u_texture, v_texCoord - vec2(onePixel.x, 0.0));
-                vec4 right = texture2D(u_texture, v_texCoord + vec2(onePixel.x, 0.0));
-                vec4 up = texture2D(u_texture, v_texCoord - vec2(0.0, onePixel.y));
-                vec4 down = texture2D(u_texture, v_texCoord + vec2(0.0, onePixel.y));
-                
-                // Edge detection
-                vec3 edgeH = abs(right.rgb - left.rgb);
-                vec3 edgeV = abs(up.rgb - down.rgb);
-                vec3 edge = edgeH + edgeV;
-                float edgeIntensity = (edge.r + edge.g + edge.b) / 3.0;
-                
-                // Calculate difference with base color
-                vec3 diff = abs(center.rgb - u_baseColor);
-                float diffIntensity = (diff.r + diff.g + diff.b) / 3.0;
-                
-                // Combine edge detection with color difference
-                float artifactIntensity = edgeIntensity * diffIntensity * 5.0;
-                
-                // Apply threshold to isolate artifacts
-                float threshold = u_threshold; // Using uniform from slider
-                
-                if (artifactIntensity > threshold) {
-                    // Highlight artifacts in a distinctive color
-                    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); // Red
-                } else {
-                    // Make the rest of the image transparent/faded
-                    gl_FragColor = vec4(center.rgb, 0.2);
-                }
-            }
-        `
-    };
     
     // Add camera switch button for mobile devices
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -410,15 +245,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const rgbColor = hexToRgb(colorPicker.value);
             gl.uniform3fv(colorUniformLocation, rgbColor);
             
-            // Update threshold if needed
-            const shaderType = shaderSelector.value;
-            if (shaderType !== 'basic') {
-                const thresholdLocation = gl.getUniformLocation(program, 'u_threshold');
-                if (thresholdLocation) {
-                    gl.uniform1f(thresholdLocation, parseFloat(thresholdSlider.value));
-                }
-            }
-            
             // Render
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
             
@@ -454,97 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
         statusDisplay.textContent = 'IMAGE SCAN COMPLETE';
     }
     
-    // ADD NEW CODE: Update shader function
-    function updateShader() {
-        // Get selected shader type
-        const shaderType = shaderSelector.value;
-        
-        // Get fragment shader source
-        const fragmentShaderSource = shaderSources[shaderType];
-        
-        // Update the canvas size for advanced shader
-        if (shaderType === 'advanced') {
-            // For video
-            if (videoElement.videoWidth) {
-                canvasElement.width = videoElement.videoWidth;
-                canvasElement.height = videoElement.videoHeight;
-            }
-            // For image
-            else if (uploadedImage.naturalWidth) {
-                canvasElement.width = uploadedImage.naturalWidth;
-                canvasElement.height = uploadedImage.naturalHeight;
-            }
-        }
-        
-        // Create vertex shader
-        const vertexShaderSource = `
-            attribute vec2 a_position;
-            attribute vec2 a_texCoord;
-            varying vec2 v_texCoord;
-            void main() {
-                gl_Position = vec4(a_position, 0.0, 1.0);
-                v_texCoord = a_texCoord;
-            }
-        `;
-        
-        // Recreate shaders and program
-        const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-        const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
-        
-        // Delete old program if it exists
-        if (program) {
-            gl.deleteProgram(program);
-        }
-        
-        program = createProgram(gl, vertexShader, fragmentShader);
-        
-        const positionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-            -1, -1,  0, 1,
-             1, -1,  1, 1,
-            -1,  1,  0, 0,
-             1,  1,  1, 0
-        ]), gl.STATIC_DRAW);
-        
-        const positionLoc = gl.getAttribLocation(program, 'a_position');
-        const texCoordLoc = gl.getAttribLocation(program, 'a_texCoord');
-        
-        gl.useProgram(program);
-        gl.enableVertexAttribArray(positionLoc);
-        gl.enableVertexAttribArray(texCoordLoc);
-        
-        gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 16, 0);
-        gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 16, 8);
-        
-        gl.uniform1i(gl.getUniformLocation(program, 'u_texture'), 0);
-        
-        // Set up the color uniform
-        colorUniformLocation = gl.getUniformLocation(program, 'u_baseColor');
-        
-        // Get color from the color picker
-        const rgbColor = hexToRgb(colorPicker.value);
-        gl.uniform3fv(colorUniformLocation, rgbColor);
-        
-        // Set threshold for advanced shaders
-        if (shaderType !== 'basic') {
-            const thresholdLocation = gl.getUniformLocation(program, 'u_threshold');
-            if (thresholdLocation) {
-                gl.uniform1f(thresholdLocation, parseFloat(thresholdSlider.value));
-            }
-        }
-        
-        // If we're processing an image, re-render it
-        if (uploadedImage.complete && uploadedImage.naturalWidth && canvasElement.style.display === 'block') {
-            gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, uploadedImage);
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-        }
-        
-        statusDisplay.textContent = `FILTER MODE: ${shaderOptions.find(opt => opt.value === shaderType).text}`;
-    }
-    
     // Initialize WebGL for camera feed
     function initWebGL() {
         // Get WebGL context
@@ -555,12 +290,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Get shader type from selector
-        const shaderType = shaderSelector.value;
-        
-        // Get fragment shader source
-        const fragmentShaderSource = shaderSources[shaderType];
-        
         // Vertex shader
         const vertexShaderSource = `
             attribute vec2 a_position;
@@ -569,6 +298,19 @@ document.addEventListener('DOMContentLoaded', function() {
             void main() {
                 gl_Position = vec4(a_position, 0.0, 1.0);
                 v_texCoord = a_texCoord;
+            }
+        `;
+
+        // Fragment shader with color difference filter
+        const fragmentShaderSource = `
+            precision highp float;
+            varying vec2 v_texCoord;
+            uniform sampler2D u_texture;
+            uniform vec3 u_baseColor;
+            void main() {
+                vec4 feed = texture2D(u_texture, v_texCoord);
+                vec3 diff = abs(feed.rgb - u_baseColor);
+                gl_FragColor = vec4(diff, 1.0);
             }
         `;
         
@@ -611,14 +353,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get color from the color picker
         const rgbColor = hexToRgb(colorPicker.value);
         gl.uniform3fv(colorUniformLocation, rgbColor);
-        
-        // Set threshold for advanced modes
-        if (shaderType !== 'basic') {
-            const thresholdLocation = gl.getUniformLocation(program, 'u_threshold');
-            if (thresholdLocation) {
-                gl.uniform1f(thresholdLocation, parseFloat(thresholdSlider.value));
-            }
-        }
         
         // Show canvas instead of video
         videoElement.style.display = 'none';
@@ -645,12 +379,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Get shader type from selector
-        const shaderType = shaderSelector.value;
-        
-        // Get fragment shader source
-        const fragmentShaderSource = shaderSources[shaderType];
-        
         // Vertex shader
         const vertexShaderSource = `
             attribute vec2 a_position;
@@ -659,6 +387,20 @@ document.addEventListener('DOMContentLoaded', function() {
             void main() {
                 gl_Position = vec4(a_position, 0.0, 1.0);
                 v_texCoord = a_texCoord;
+            }
+        `;
+
+        // Fragment shader - updated for clean output
+        const fragmentShaderSource = `
+            precision highp float;
+            varying vec2 v_texCoord;
+            uniform sampler2D u_texture;
+            uniform vec3 u_baseColor;
+            void main() {
+                vec4 feed = texture2D(u_texture, v_texCoord);
+                vec3 diff = abs(feed.rgb - u_baseColor);
+                gl_FragColor = vec4(diff, 1.0);
+                // No additional effects - just the color difference filter
             }
         `;
         
@@ -702,14 +444,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const rgbColor = hexToRgb(colorPicker.value);
         gl.uniform3fv(colorUniformLocation, rgbColor);
         
-        // Set threshold for advanced modes
-        if (shaderType !== 'basic') {
-            const thresholdLocation = gl.getUniformLocation(program, 'u_threshold');
-            if (thresholdLocation) {
-                gl.uniform1f(thresholdLocation, parseFloat(thresholdSlider.value));
-            }
-        }
-        
         // Render the image with filter
         gl.viewport(0, 0, canvasElement.width, canvasElement.height);
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -724,11 +458,6 @@ document.addEventListener('DOMContentLoaded', function() {
         colorPicker.addEventListener('input', function() {
             updateImageColor();
         });
-        
-        // Add event listener for shader selector changes
-        shaderSelector.addEventListener('change', function() {
-            updateShader();
-        });
     }
     
     // Update color for image
@@ -742,108 +471,81 @@ document.addEventListener('DOMContentLoaded', function() {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, uploadedImage);
-        
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         
-        statusDisplay.textContent = `COLOR UPDATED: ${colorPicker.value}`;
+        statusDisplay.textContent = `FILTER UPDATED: ${colorPicker.value}`;
     }
     
-    // Helper functions
+    // Convert hex color to RGB values (0.0 to 1.0)
+    function hexToRgb(hex) {
+        const r = parseInt(hex.substring(1, 3), 16) / 255;
+        const g = parseInt(hex.substring(3, 5), 16) / 255;
+        const b = parseInt(hex.substring(5, 7), 16) / 255;
+        return [r, g, b];
+    }
     
-    // Create shader
+    // Adjust container size for the video
+    function adjustVideoContainerForVideo() {
+        const videoAspect = videoElement.videoHeight / videoElement.videoWidth;
+        
+        // Set the container width to 100% of its parent
+        videoContainer.style.width = '100%';
+        
+        // Set the height based on the aspect ratio
+        const containerWidth = videoContainer.clientWidth;
+        videoContainer.style.height = containerWidth * videoAspect + 'px';
+        
+        // Adjust canvas to match container
+        canvasElement.style.width = '100%';
+        canvasElement.style.height = '100%';
+    }
+    
+    // Adjust container size for the image
+    function adjustVideoContainerForImage() {
+        const imgAspect = uploadedImage.naturalHeight / uploadedImage.naturalWidth;
+        
+        // Set the container width to 100% of its parent
+        videoContainer.style.width = '100%';
+        
+        // Set the height based on the aspect ratio
+        const containerWidth = videoContainer.clientWidth;
+        videoContainer.style.height = containerWidth * imgAspect + 'px';
+        
+        // Adjust canvas to match container
+        canvasElement.style.width = '100%';
+        canvasElement.style.height = '100%';
+    }
+    
+    // Create shader function
     function createShader(gl, type, source) {
         const shader = gl.createShader(type);
         gl.shaderSource(shader, source);
         gl.compileShader(shader);
         
-        // Check if shader compiled successfully
         const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
-        if (!success) {
-            const info = gl.getShaderInfoLog(shader);
-            gl.deleteShader(shader);
-            throw new Error('Could not compile shader: ' + info);
+        if (success) {
+            return shader;
         }
         
-        return shader;
+        console.log(gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
     }
     
-    // Create WebGL program
+    // Create program function
     function createProgram(gl, vertexShader, fragmentShader) {
         const program = gl.createProgram();
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);
         gl.linkProgram(program);
         
-        // Check if link was successful
         const success = gl.getProgramParameter(program, gl.LINK_STATUS);
-        if (!success) {
-            const info = gl.getProgramInfoLog(program);
-            gl.deleteProgram(program);
-            throw new Error('Could not link program: ' + info);
+        if (success) {
+            return program;
         }
         
-        return program;
+        console.log(gl.getProgramInfoLog(program));
+        gl.deleteProgram(program);
+        return null;
     }
-    
-    // Convert hex color to RGB array
-    function hexToRgb(hex) {
-        // Remove # if present
-        hex = hex.replace('#', '');
-        
-        // Parse hex values
-        const r = parseInt(hex.substring(0, 2), 16) / 255;
-        const g = parseInt(hex.substring(2, 4), 16) / 255;
-        const b = parseInt(hex.substring(4, 6), 16) / 255;
-        
-        return [r, g, b];
-    }
-    
-    // Adjust video container size for video
-    function adjustVideoContainerForVideo() {
-        // Set container dimensions based on video size
-        const aspectRatio = videoElement.videoWidth / videoElement.videoHeight;
-        
-        // Limit maximum width to prevent overflow
-        const maxWidth = Math.min(window.innerWidth - 40, 800);
-        let width = maxWidth;
-        let height = width / aspectRatio;
-        
-        // If height is too large, constrain by height instead
-        if (height > window.innerHeight - 200) {
-            height = window.innerHeight - 200;
-            width = height * aspectRatio;
-        }
-        
-        videoContainer.style.width = width + 'px';
-        videoContainer.style.height = height + 'px';
-    }
-    
-    // Adjust video container size for image
-    function adjustVideoContainerForImage() {
-        // Set container dimensions based on image size
-        const aspectRatio = uploadedImage.naturalWidth / uploadedImage.naturalHeight;
-        
-        // Limit maximum width to prevent overflow
-        const maxWidth = Math.min(window.innerWidth - 40, 800);
-        let width = maxWidth;
-        let height = width / aspectRatio;
-        
-        // If height is too large, constrain by height instead
-        if (height > window.innerHeight - 200) {
-            height = window.innerHeight - 200;
-            width = height * aspectRatio;
-        }
-        
-        videoContainer.style.width = width + 'px';
-        videoContainer.style.height = height + 'px';
-    }
-    
-    // Handle window resize
-    window.addEventListener('resize', function() {
-        if (videoElement.videoWidth) {
-            adjustVideoContainerForVideo();
-        } else if (uploadedImage.naturalWidth) {
-            adjustVideoContainerForImage();
-        }
-    });
 });
